@@ -1,46 +1,40 @@
-# Reporte de Práctica: Escaneo de Red con Nmap y Metasploitable
+# Práctica de Laboratorio: Monitoreo y Análisis de Tráfico de Red con ntopng y pfSense
 
-**Estudiante:** Manuel  
-**Materia:** Ciberseguridad / Pruebas de Penetración  
-
----
-
-## 1. Introducción
-En esta práctica de laboratorio se configuró un entorno controlado de pruebas de penetración utilizando dos máquinas virtuales en VirtualBox:
-* **Máquina Atacante:** Kali Linux
-* **Máquina Víctima:** Metasploitable 2
-
-El objetivo principal fue identificar la dirección IP de ambos sistemas, verificar la conectividad entre ellos mediante el comando `ping` y realizar un escaneo de puertos y servicios utilizando **Nmap**.
+## 1. Objetivo de la Práctica
+Desplegar y analizar el comportamiento del tráfico de red en tiempo real mediante la sonda de monitoreo **ntopng** integrada en la interfaz **LAN** del firewall **pfSense**, utilizando **Kali Linux** como host dentro del segmento virtualizado.
 
 ---
 
-## 2. Direcciones IP de los Equipos
-
-Para verificar el direccionamiento de la red local creada en VirtualBox, se ejecutaron los comandos de red en ambas máquinas virtuales.
-
-### IP de Kali Linux
-Se ejecutó el comando `ip a` en la terminal de Kali Linux para obtener su dirección IP.
-
-![IP de Kali Linux](01_kali_ip.png)
-
-### IP de Metasploitable 2
-Se inició sesión en la consola de Metasploitable y se ejecutó el comando `ifconfig`.
-
-![IP de Metasploitable](02_metasploitable_ip.png)
+## 2. Información del Entorno
+* **Firewall / Gateway:** pfSense (`192.168.100.1`)
+* **Host de Pruebas / Auditoría:** Kali Linux (`192.168.100.11`)
+* **Servicio de Monitoreo:** ntopng (`Puerto 3000`)
+* **Interfaz de Captura:** `em1` (LAN)
 
 ---
 
-## 3. Pruebas de Conectividad (Ping)
-Se realizó una prueba de ICMP Echo Request desde la máquina atacante (Kali Linux) hacia la máquina víctima (Metasploitable) para confirmar que ambas se encuentran en la misma red y tienen conectividad.
+## 3. Evidencias del Monitoreo y Análisis
 
-![Prueba de Ping](03_ping_exitoso.png)
+### Fase 1: Panel General (Dashboard)
+Se verificó el inicio de sesión y la actividad general del tráfico procesado por la sonda ntopng a través del dashboard principal.
 
-**Resultado:** Se obtuvo un 0% de pérdida de paquetes, confirmando la comunicación directa entre ambas máquinas virtuales.
+![Dashboard General de ntopng](./01-dashboard.png)
 
 ---
 
-## 4. Escaneo de Puertos y Servicios con Nmap
-Una vez confirmada la conectividad, se ejecutó un escaneo de detección de versiones y puertos abiertos desde Kali Linux hacia Metasploitable con el siguiente comando:
+### Fase 2: Análisis de Consumo por Host (Hosts)
+Se generó tráfico desde la máquina Kali Linux (`192.168.100.11`) hacia la interfaz del firewall (`192.168.100.1`). La sonda registró y clasificó la distribución del volumen de tráfico entre los hosts activos.
 
-```bash
-nmap -sV <IP_DE_METASPLOITABLE>
+![Distribución de Tráfico por Hosts](./02-hosts.png)
+
+---
+
+### Fase 3: Captura de Flujos en Tiempo Real (Live Flows)
+Se inspeccionaron las sesiones y flujos activos (*Live Flows*), observando la clasificación de protocolos a nivel de capa de aplicación (L7), el estado de las conexiones TCP y el consumo en bytes por sesión.
+
+![Análisis de Flujos Activos](./03-flows.png)
+
+---
+
+## 4. Conclusión
+La implementación de ntopng sobre pfSense otorga visibilidad detallada de Capa 7 (L7) del modelo OSI, permitiendo monitorear el consumo de ancho de banda y analizar la interacción entre los hosts de la red interna de manera precisa.
